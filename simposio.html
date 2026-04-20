@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Simposio Digitale</title>
+    <style>
+        /* Qui definiamo lo stile (CSS) */
+        body {
+            background-color: #fdf6e3; /* Un colore crema riposante */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { color: #8b4513; text-shadow: 1px 1px 2px #ccc; }
+
+        /* Il contenitore della chat */
+        .chat-card {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            border: 4px solid #d4a373;
+        }
+
+        /* L'area dei messaggi */
+        #chat-window {
+            height: 350px;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-image: linear-gradient(to bottom, #ffffff, #fff9f0);
+        }
+
+        /* Nuvoletta del filosofo */
+        .bubble-bot {
+            background: #faedcd;
+            padding: 12px 18px;
+            border-radius: 20px 20px 20px 5px;
+            align-self: flex-start;
+            max-width: 80%;
+            border: 1px solid #e9d8a6;
+        }
+
+        /* Area di input in basso */
+        .input-area {
+            display: flex;
+            padding: 15px;
+            background: #f1f1f1;
+            gap: 10px;
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        button {
+            background: #d4a373;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { background: #bc8a5f; }
+    </style>
+</head>
+<body>
+
+    <h1>🏛️ Il Simposio dei Piccoli</h1>
+
+    <div class="chat-card">
+        <div id="chat-window">
+            <div class="bubble-bot">
+                <strong>Talete:</strong> Ciao! Sono Talete di Mileto. Sapevi che tutto ciò che vedi è fatto d'acqua? Chiedimi pure il perché!
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Scrivi al filosofo...">
+            <button onclick="mostraMessaggio()">Invia</button>
+        </div>
+    </div>
+
+    <script>
+        // Per ora facciamo solo apparire quello che scrive il bambino
+        function mostraMessaggio() {
+            const input = document.getElementById('user-input');
+            const window = document.getElementById('chat-window');
+            
+            if (input.value.trim() !== "") {
+                window.innerHTML += `<div style="align-self: flex-end; background: #e9edc9; padding: 10px; border-radius: 20px 20px 5px 20px;">${input.value}</div>`;
+                input.value = "";
+                window.scrollTop = window.scrollHeight;
+            }
+        }
+    </script>
+
+</body>
+</html>
