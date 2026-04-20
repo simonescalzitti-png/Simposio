@@ -75,59 +75,65 @@
     </div>
 
     <script>
-        let apiKey = "";
+    var apiKey = "";
 
-        // Chiediamo la chiave all'apertura della pagina
-        window.onload = () => {
-            apiKey = prompt("Per favore, inserisci la tua API Key per attivare i filosofi:");
-        };
+    // Chiediamo la chiave API appena la pagina è pronta
+    window.onload = function() {
+        apiKey = prompt("Per favore, inserisci la tua API Key per attivare i filosofi:");
+        if (!apiKey) {
+            alert("Attenzione: senza chiave i filosofi non potranno risponderti.");
+        }
+    };
 
-        async function chiediAlFilosofo() {
-    const filosofo = document.getElementById('select-filosofo').value;
-    const input = document.getElementById('user-msg');
-    const messaggio = input.value;
-    const chatContent = document.getElementById('chat-content');
+    async function chiediAlFilosofo() {
+        var filosofo = document.getElementById('select-filosofo').value;
+        var input = document.getElementById('user-msg');
+        var messaggio = input.value;
+        var chatContent = document.getElementById('chat-content');
 
-    if (!messaggio || !apiKey) {
-        alert("Inserisci un messaggio e assicurati che la Chiave API sia presente!");
-        return;
-    }
-
-    // Mostra messaggio alunno
-    chatContent.innerHTML += `<div class="msg alunno"><strong>Tu:</strong> ${messaggio}</div>`;
-    input.value = "";
-    chatContent.scrollTop = chatContent.scrollHeight;
-
-    const istruzioni = `Tu sei il filosofo ${filosofo}. Rispondi a un bambino di 9 anni in modo semplice e gentile. Massimo 2 frasi.`;
-
-    // URL semplificato e senza fronzoli
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: istruzioni + "\nDomanda: " + messaggio }]
-                }]
-            })
-        });
-
-        if (!response.ok) {
-            // Se c'è un errore, leggiamo cosa dice il server di Google
-            const errorData = await response.json();
-            throw new Error(errorData.error.message || "Errore sconosciuto");
+        if (!messaggio) return;
+        if (!apiKey) {
+            alert("Manca la chiave API! Ricarica la pagina per inserirla.");
+            return;
         }
 
-        const data = await response.json();
-        const rispostaIA = data.candidates[0].content.parts[0].text;
-
-        chatContent.innerHTML += `<div class="msg filosofo"><strong>${filosofo}:</strong> ${rispostaIA}</div>`;
+        // Mostra messaggio dell'alunno
+        chatContent.innerHTML += '<div class="msg alunno"><strong>Tu:</strong> ' + messaggio + '</div>';
+        input.value = "";
         chatContent.scrollTop = chatContent.scrollHeight;
 
-    } catch (error) {
-        console.error("Dettaglio errore:", error);
-        chatContent.innerHTML += `<div class="msg filosofo"><em>Il saggio è confuso. Errore: ${error.message}</em></div>`;
+        // Istruzioni per il filosofo
+        var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
+
+        // Indirizzo per Google Gemini
+        var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+
+        try {
+            var response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: istruzioni + "\nDomanda: " + messaggio }]
+                    }]
+                })
+            });
+
+            var data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+
+            var rispostaIA = data.candidates[0].content.parts[0].text;
+
+            // Mostra risposta del filosofo
+            chatContent.innerHTML += '<div class="msg filosofo"><strong>' + filosofo + ':</strong> ' + rispostaIA + '</div>';
+            chatContent.scrollTop = chatContent.scrollHeight;
+
+        } catch (error) {
+            console.error("Errore tecnico:", error);
+            chatContent.innerHTML += '<div class="msg filosofo"><em>Il saggio è confuso. Errore: ' + error.message + '</em></div>';
+        }
     }
-}
+</script>
