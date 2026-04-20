@@ -50,48 +50,54 @@
         };
 
         async function chiediAlFilosofo() {
-            var filosofo = document.getElementById('select-filosofo').value;
-            var input = document.getElementById('user-msg');
-            var messaggio = input.value;
-            var chatContent = document.getElementById('chat-content');
+    var filosofo = document.getElementById('select-filosofo').value;
+    var input = document.getElementById('user-msg');
+    var messaggio = input.value;
+    var chatContent = document.getElementById('chat-content');
 
-            if (!messaggio || !apiKey) return;
+    if (!messaggio || !apiKey) return;
 
-            chatContent.innerHTML += '<div class="msg alunno"><strong>Tu:</strong> ' + messaggio + '</div>';
-            input.value = "";
+    chatContent.innerHTML += '<div class="msg alunno"><strong>Tu:</strong> ' + messaggio + '</div>';
+    input.value = "";
 
-            var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
-            
-           var url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
-            
-            try {
-                var response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: istruzioni + "\nDomanda: " + messaggio }] }]
-                    })
-                });
+    var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
+    
+    // Proviamo i tre nomi più comuni in ordine di probabilità
+    var modelliDaProvare = [
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
+    ];
 
-                var data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
+    var successo = false;
 
-                if (data.candidates && data.candidates[0].content) {
-                    var rispostaIA = data.candidates[0].content.parts[0].text;
-                    chatContent.innerHTML += '<div class="msg filosofo"><strong>' + filosofo + ':</strong> ' + rispostaIA + '</div>';
-                } else {
-                    throw new Error("Risposta vuota da Google");
-                }
-                
+    for (var baseUrl of modelliDaProvare) {
+        if (successo) break;
+
+        try {
+            var url = baseUrl + "?key=" + apiKey;
+            var response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: istruzioni + "\nDomanda: " + messaggio }] }]
+                })
+            });
+
+            var data = await response.json();
+
+            if (response.ok && data.candidates) {
+                var rispostaIA = data.candidates[0].content.parts[0].text;
+                chatContent.innerHTML += '<div class="msg filosofo"><strong>' + filosofo + ':</strong> ' + rispostaIA + '</div>';
                 chatContent.scrollTop = chatContent.scrollHeight;
-
-            } catch (error) {
-                chatContent.innerHTML += '<div class="msg filosofo"><em>Errore: ' + error.message + '</em></div>';
+                successo = true;
             }
+        } catch (e) {
+            console.log("Tentativo fallito con: " + baseUrl);
         }
-    </script>
-</body>
-</html>
+    }
+
+    if (!successo) {
+        chatContent.innerHTML += '<div class="msg filosofo"><em>Il saggio non riesce a connettersi. Controlla che la chiave API sia attiva su Google AI Studio.</em></div>';
+    }
+}
