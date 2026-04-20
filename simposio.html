@@ -102,11 +102,10 @@
         input.value = "";
         chatContent.scrollTop = chatContent.scrollHeight;
 
-        // Istruzioni per il filosofo
         var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
 
-        // Indirizzo per Google Gemini
-        var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+        // URL AGGIORNATO: Usiamo la v1 (più stabile) e il modello gemini-1.5-flash
+        var url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
         try {
             var response = await fetch(url, {
@@ -121,6 +120,7 @@
 
             var data = await response.json();
 
+            // Se l'errore persiste, proviamo a leggere il motivo esatto
             if (data.error) {
                 throw new Error(data.error.message);
             }
@@ -136,4 +136,3 @@
             chatContent.innerHTML += '<div class="msg filosofo"><em>Il saggio è confuso. Errore: ' + error.message + '</em></div>';
         }
     }
-</script>
