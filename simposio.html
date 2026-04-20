@@ -6,133 +6,85 @@
     <title>Il Simposio Digitale</title>
     <style>
         body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #fdf6e3; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        .chat-container { 
-            background: white; 
-            border: 4px solid #d4a373; 
-            border-radius: 20px; 
-            width: 95%; 
-            max-width: 600px; 
-            padding: 15px; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        #chat-content { 
-            height: 350px; 
-            overflow-y: auto; 
-            margin-bottom: 15px; 
-            border-bottom: 2px solid #eee; 
-            padding: 10px; 
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        .chat-container { background: white; border: 4px solid #d4a373; border-radius: 20px; width: 95%; max-width: 600px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        #chat-content { height: 350px; overflow-y: auto; margin-bottom: 15px; border-bottom: 2px solid #eee; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
         .msg { padding: 12px; border-radius: 15px; max-width: 85%; line-height: 1.5; }
         .filosofo { background: #faedcd; align-self: flex-start; border-left: 5px solid #d4a373; }
         .alunno { background: #e9edc9; align-self: flex-end; text-align: right; }
-
         .controlli { display: flex; gap: 8px; flex-wrap: wrap; }
         select, input { padding: 12px; border-radius: 10px; border: 1px solid #ccc; outline: none; }
         input { flex-grow: 1; }
-        
-        button { 
-            padding: 12px 20px; 
-            background: #d4a373; 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: bold;
-        }
-
-        .btn-home { background: #8b4513; margin-bottom: 15px; }
+        button { padding: 12px 20px; background: #d4a373; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .btn-home { background: #8b4513; margin-bottom: 15px; color: white; padding: 10px; border-radius: 10px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <a href="index.html" style="text-decoration: none;">
-        <button class="btn-home">⬅ Torna alla Home</button>
-    </a>
+    <button class="btn-home" onclick="window.location.href='index.html'">⬅ Torna alla Home</button>
 
     <div class="chat-container">
         <label>Scegli il tuo maestro:</label>
         <select id="select-filosofo">
-            <option value="Talete">Talete (Tutto è acqua)</option>
-            <option value="Eraclito">Eraclito (Tutto scorre)</option>
-            <option value="Lucrezio">Lucrezio (Gli atomi)</option>
-            <option value="Anassimandro">Anassimandro (L'infinito)</option>
+            <option value="Talete">Talete</option>
+            <option value="Eraclito">Eraclito</option>
+            <option value="Lucrezio">Lucrezio</option>
+            <option value="Anassimandro">Anassimandro</option>
         </select>
 
         <div id="chat-content">
-            <div class="msg filosofo"><strong>Saggio:</strong> Salve, giovane cercatore di verità! Scegli un filosofo e scrivimi qualcosa... io sono pronto a risponderti!</div>
+            <div class="msg filosofo"><strong>Saggio:</strong> Salve! Inserisci la chiave, scegli un filosofo e scrivimi...</div>
         </div>
 
         <div class="controlli">
             <input type="text" id="user-msg" placeholder="Chiedi qualcosa...">
-            <button onclick="chiediAlFilosofo()">Parla!</button>
+            <button id="btn-parla">Parla!</button>
         </div>
     </div>
 
     <script>
-    var apiKey = "";
+        var apiKey = "";
 
-    // Chiediamo la chiave API appena la pagina è pronta
-    window.onload = function() {
-        apiKey = prompt("Per favore, inserisci la tua API Key per attivare i filosofi:");
-        if (!apiKey) {
-            alert("Attenzione: senza chiave i filosofi non potranno risponderti.");
-        }
-    };
+        window.onload = function() {
+            apiKey = prompt("Inserisci la tua API Key:");
+            
+            // Colleghiamo il tasto via codice per evitare l'errore "not defined"
+            document.getElementById('btn-parla').onclick = chiediAlFilosofo;
+        };
 
-    async function chiediAlFilosofo() {
-        var filosofo = document.getElementById('select-filosofo').value;
-        var input = document.getElementById('user-msg');
-        var messaggio = input.value;
-        var chatContent = document.getElementById('chat-content');
+        async function chiediAlFilosofo() {
+            var filosofo = document.getElementById('select-filosofo').value;
+            var input = document.getElementById('user-msg');
+            var messaggio = input.value;
+            var chatContent = document.getElementById('chat-content');
 
-        if (!messaggio) return;
-        if (!apiKey) {
-            alert("Manca la chiave API! Ricarica la pagina per inserirla.");
-            return;
-        }
+            if (!messaggio || !apiKey) return;
 
-        // Mostra messaggio dell'alunno
-        chatContent.innerHTML += '<div class="msg alunno"><strong>Tu:</strong> ' + messaggio + '</div>';
-        input.value = "";
-        chatContent.scrollTop = chatContent.scrollHeight;
+            chatContent.innerHTML += '<div class="msg alunno"><strong>Tu:</strong> ' + messaggio + '</div>';
+            input.value = "";
 
-        var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
+            var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
+            var url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
-        // URL AGGIORNATO: Usiamo la v1 (più stabile) e il modello gemini-1.5-flash
-        var url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+            try {
+                var response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: istruzioni + "\nDomanda: " + messaggio }] }]
+                    })
+                });
 
-        try {
-            var response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: istruzioni + "\nDomanda: " + messaggio }]
-                    }]
-                })
-            });
+                var data = await response.json();
+                if (data.error) throw new Error(data.error.message);
 
-            var data = await response.json();
+                var rispostaIA = data.candidates[0].content.parts[0].text;
+                chatContent.innerHTML += '<div class="msg filosofo"><strong>' + filosofo + ':</strong> ' + rispostaIA + '</div>';
+                chatContent.scrollTop = chatContent.scrollHeight;
 
-            // Se l'errore persiste, proviamo a leggere il motivo esatto
-            if (data.error) {
-                throw new Error(data.error.message);
+            } catch (error) {
+                chatContent.innerHTML += '<div class="msg filosofo"><em>Errore: ' + error.message + '</em></div>';
             }
-
-            var rispostaIA = data.candidates[0].content.parts[0].text;
-
-            // Mostra risposta del filosofo
-            chatContent.innerHTML += '<div class="msg filosofo"><strong>' + filosofo + ':</strong> ' + rispostaIA + '</div>';
-            chatContent.scrollTop = chatContent.scrollHeight;
-
-        } catch (error) {
-            console.error("Errore tecnico:", error);
-            chatContent.innerHTML += '<div class="msg filosofo"><em>Il saggio è confuso. Errore: ' + error.message + '</em></div>';
         }
-    }
+    </script>
+</body>
+</html>
