@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Simposio dei Piccoli</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #fdf6e3;
+            color: #5d4037;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        .hero {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 5px solid #d4a373;
+            max-width: 80%;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #8b4513; }
+        p { font-size: 1.2rem; line-height: 1.6; }
+
+        .btn-entrate {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 15px 40px;
+            background-color: #d4a373;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.4rem;
+            border-radius: 50px;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-entrate:hover {
+            background-color: #bc8a5f;
+            transform: scale(1.05);
+        }
+
+        .icona-filosofia { font-size: 4rem; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="icona-filosofia">🏛️</div>
+        <h1>Il Simposio dei Piccoli</h1>
+        <p>Benvenuti, giovani esploratori del pensiero!<br> 
+        Siete pronti a chiacchierare con i grandi filosofi dell'antichità?</p>
+        
+        <a href="simposio.html" class="btn-entrate">Entra nel Simposio</a>
+    </div>
+
+</body>
+</html>
