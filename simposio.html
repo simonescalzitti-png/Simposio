@@ -50,40 +50,44 @@
             // Colleghiamo il tasto via codice per evitare l'errore "not defined"
             document.getElementById('btn-parla').onclick = chiediAlFilosofo;
         };
-
         async function chiediAlFilosofo() {
-            var filosofo = document.getElementById('select-filosofo').value;
-            var input = document.getElementById('user-msg');
-            var messaggio = input.value;
-            var chatContent = document.getElementById('chat-content');
+    var filosofo = document.getElementById('select-filosofo').value;
+    var input = document.getElementById('user-msg');
+    var messaggio = input.value;
+    var chatContent = document.getElementById('chat-content');
 
-            if (!messaggio || !apiKey) return;
+    if (!messaggio || !apiKey) return;
 
-            chatContent.innerHTML += '<div class="msg alunno"><strong>Tu:</strong> ' + messaggio + '</div>';
-            input.value = "";
+    chatContent.innerHTML += '<div class="msg alunno"><strong>Tu:</strong> ' + messaggio + '</div>';
+    input.value = "";
 
-            var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
-            var url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + apiKey;
-            try {
-                var response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: istruzioni + "\nDomanda: " + messaggio }] }]
-                    })
-                });
+    var istruzioni = "Sei il filosofo " + filosofo + ". Rispondi a un bimbo di 9 anni in modo semplice e gentile. Massimo 2 frasi.";
+    
+    // URL aggiornato con "latest" e "v1beta" - la combinazione più compatibile oggi
+    var url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
 
-                var data = await response.json();
-                if (data.error) throw new Error(data.error.message);
+    try {
+        var response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: istruzioni + "\nDomanda: " + messaggio }] }]
+            })
+        });
 
-                var rispostaIA = data.candidates[0].content.parts[0].text;
-                chatContent.innerHTML += '<div class="msg filosofo"><strong>' + filosofo + ':</strong> ' + rispostaIA + '</div>';
-                chatContent.scrollTop = chatContent.scrollHeight;
-
-            } catch (error) {
-                chatContent.innerHTML += '<div class="msg filosofo"><em>Errore: ' + error.message + '</em></div>';
-            }
+        var data = await response.json();
+        
+        // Se c'è un errore, mostriamolo chiaramente
+        if (data.error) {
+            console.error("Dettagli errore Google:", data.error);
+            throw new Error(data.error.message);
         }
-    </script>
-</body>
-</html>
+
+        var rispostaIA = data.candidates[0].content.parts[0].text;
+        chatContent.innerHTML += '<div class="msg filosofo"><strong>' + filosofo + ':</strong> ' + rispostaIA + '</div>';
+        chatContent.scrollTop = chatContent.scrollHeight;
+
+    } catch (error) {
+        chatContent.innerHTML += '<div class="msg filosofo"><em>Errore: ' + error.message + '</em></div>';
+    }
+}
