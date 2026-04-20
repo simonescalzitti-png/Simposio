@@ -1,0 +1,22 @@
+{
+  "short_name": "Simposio",
+  "name": "Il Simposio dei Piccoli: Chiacchiere Filosofiche",
+  "description": "Un'app per parlare con i grandi filosofi dell'antichità.",
+  "icons": [
+    {
+      "src": "icona-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icona-1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#fdf6e3",
+  "display": "standalone",
+  "theme_color": "#d4a373",
+  "orientation": "portrait-primary"
+}
